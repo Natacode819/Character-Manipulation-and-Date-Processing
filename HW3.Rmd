@@ -1,0 +1,273 @@
+---
+title: "Character Manipulation"
+author: "Nataliya Ferdinand"
+date: "2024-09-15"
+output: html_document
+---
+
+# **Introduction:**
+
+This article delves into the economic realities that college students face when choosing a major, highlighting how a degree alone no longer guarantees financial success. It examines detailed data on earnings across different fields of study, revealing significant disparities in income potential. By analyzing trends and offering insights, the article underscores the importance of making informed choices when selecting a major, as it can dramatically influence graduates' long-term financial outcomes and career trajectories.
+
+The link to the article: 
+**https://fivethirtyeight.com/features/the-economic-guide-to-picking-a-college-major/**
+
+
+```{r}
+library(dplyr)
+file_path<-"https://raw.githubusercontent.com/Natacode819/Character-Manipulation-and-Date-Processing/main/all-ages.csv"
+majors<-read.csv(file_path)
+head(majors, 10)
+
+```
+
+```{r}
+colnames(majors)
+```
+
+##### **#1 Providing code that identifies the majors that contain either "DATA" or "STATISTICS"** 
+
+```{r}
+subset_majors<-majors%>% filter(grepl("DATA|STATISTICS", Major, ,ignore.case=TRUE))
+subset_majors
+```
+
+```{r}
+library(tidyverse)
+library(stringr)
+
+```
+
+##### **#2 Write code that transforms the data below:**
+
+
+```{r}
+input_data <- '[1] "bell pepper"  "bilberry"     "blackberry"   "blood orange"
+[5] "blueberry"    "cantaloupe"   "chili pepper" "cloudberry"   
+[9] "elderberry"   "lime"         "lychee"       "mulberry"     
+[13] "olive"        "salal berry"'
+
+input_data
+```
+
+First, I remove the indices and newlines, then collapse the string into a single line
+
+```{r}
+cleaned_data <- gsub("\\[\\d+\\]", "", input_data) # Remove indices
+cleaned_data
+```
+
+Second, I remove newlines
+
+```{r}
+cleaned_data <- gsub("\n", "", cleaned_data)       
+cleaned_data 
+```
+
+Third, I replace multiple spaces with a single space
+
+```{r}
+cleaned_data <- gsub("  +", " ", cleaned_data)      
+cleaned_data
+```
+
+Forth, I add commas between items
+
+```{r}
+cleaned_data <- gsub('" "', '", "', cleaned_data)
+cleaned_data
+```
+Next, I format the final output
+
+```{r}
+formatted_output <- paste0("c(",cleaned_data,")")
+formatted_output
+```
+
+Last, I remove leading/trailing spaces
+
+```{r}
+formatted_output <- gsub('^\\s+"|"$', '', formatted_output) 
+formatted_output
+```
+
+To provide a desired format, I print the formatted output using cat() function
+
+```{r}
+cat(formatted_output)
+```
+
+##### **#3 Describe, in words, what these expressions will match:**
+
++  `(.)\\1\\1`
+
++  `(.)(.)\\2\\1`
+
++ `(..)\1`
+
++ `(.)\\.\\1.\\1`
+
++ `(.)(.)(.).*\\3\\2\\1`
+
+##### I load the **stringr** package, which provides a set of functions designed to simplify string manipulation in R. I use  **str_subset()** function to match expressions
+
+```{r}
+library(stringr)
+```
+Data to match expressions:
+
+```{r}
+words<-c("aaaaa", "dddy" , "reremind", "xyxy", "agga", "129921", "a.a.a", "1.1.1", "a.b.a", "7755745", "abcxyzcbazyx", "123456321", "fggggddsss")
+```
+I use str_detect() to check if the expression `(.)\\1\\1` matches. 
+
+###### (.) captures any single character (denoted by `.`) and stores it in a capturing group.
+
+###### The first `\\1` refers to the first capturing group, so it matches the same character captured in the first group.
+
+###### The second `\\1` again refers to the first capturing group, matching the same character once more.
+
+###### In short, `(.)\\1\\1` will match any string where the same character appears three times in a row.
+
+```{r}
+match1<-words%>%str_subset("(.)\\1\\1")
+match1
+```
+The next example is to match `(.)(.)\\2\\1` expression.
+
+###### This expression is used to match a pattern where two characters are followed by the same characters in reverse order. Here’s a breakdown:
+
+###### `(.)(.)` captures two consecutive characters. Each character is captured by a separate group:
+###### The first `.` captures any single character and stores it in the first capturing group (`\\1`).
+###### The second `.` captures any single character and stores it in the second capturing group (`\\2`).
+
+###### `\\2` matches the same character as captured by the second capturing group. So, this part matches the second character again.
+
+###### `\\1` matches the same character as captured by the first capturing group. So, this part matches the first character again.
+
+###### In short, `(.)(.)\\2\\1` matches a sequence where the first two characters are followed by those same characters in reverse order.
+
+```{r}
+match2<-words%>%str_subset("(.)(.)\\2\\1")
+match2
+```
+The third example is to match `(..)\1` expression.This expression is used to match a sequence where a two-character substring is immediately followed by a repetition of the same two-character substring. The details are as follows: 
+
+###### `( .. )` captures any two characters into a capturing group. This means the first part of the pattern is any two-character sequence.
+
+###### `\1` refers to the content of the first capturing group, meaning it matches the same two-character sequence captured by the first group.
+
+###### In short, `(..)\1` will match any string where a two-character sequence is immediately followed by the same two-character sequence.
+
+```{r}
+match3<-words%>%str_subset("\\b(..)\\1\\b")
+match3
+```
+The next example is to match `(.)\\.\\1.\\1` expression. This expression is used to match a pattern where a single character is repeated at specific positions in a string, separated by literal dots. Here’s a breakdown:
+
+###### `(.)` captures any single character into the first capturing group.
+
+###### `\.` matches a literal dot.
+
+###### `\1` refers to the same character captured by the first capturing group.
+
+###### `\.` matches another literal dot.
+
+###### `\1` refers to the same character again, matching the same character as the one captured in the first group.
+
+###### In short, `(.)\\.\\1.\\1` will match a string where a single character is followed by a dot, then the same character is followed by another dot, and then the same character appears again.
+
+```{r}
+match4<-words%>%str_subset("(.)\\.\\1.\\1")
+match4
+```
+The final example is to match `(.)(.)(.).*\\3\\2\\1` expression.This expression is used to match a string where three specific characters are repeated in reverse order after any number of other characters. Here’s a breakdown:
+
+###### `(.)(.)(.)` captures three consecutive characters into three separate capturing groups:
+
+###### The first `(.)` captures the first character.
+
+###### The second `(.)` captures the second character.
+
+###### The third `(.)` captures the third character.
+
+###### `.*` matches any number of any characters. This allows for any content to appear between the initial three characters and their reversed repetition.
+
+###### `\\3` refers to the third capturing group.
+
+###### `\\2` refers to the second capturing group.
+
+###### `\\1` refers to the first capturing group.
+
+###### In short, `(.)(.)(.).*\\3\\2\\1` will match any string where the first three characters appers first; after these characters, there can be any sequence of characters; and the same three characters appear again in reverse order.
+
+```{r}
+match5<-words%>%str_subset("(.)(.)(.).*\\3\\2\\1")
+match5
+```
+
+##### **#4 Construct regular expressions to match words that:**
+
++ Start and end with the same character.
+
++ Contain a repeated pair of letters (e.g. "church" contains "ch" repeated twice.)
+
++ Contain one letter repeated in at least three places (e.g. "eleven" contains three "e"s.)
+
+##### **Explanation for "Start and end with the same character":**
+
+###### `^` asserts the start of the string.
+
+###### `(.)` captures the first character.
+
+###### `.*` matches any characters (zero or more) in between.
+
+###### `\\1` ensures that the last character matches the first captured character.
+
+###### `$` asserts the end of the string.
+
+```{r}
+words_match1<-c("throughout", "level", "window", "see", "need", "refer")
+words_match1
+```
+
+```{r}
+match6<-words_match1%>%str_subset("^(.)[\\s\\S]*\\1$")
+match6
+```
+
+##### **Explanation for "Contain a repeated pair of letters (e.g. "church" contains "ch" repeated twice.)":**
+
+###### `(..)`: Captures any two consecutive characters (a pair).
+
+###### `.*`: Matches any number of characters in between (if any).
+
+###### `\\1`: Ensures the pair captured is repeated somewhere later in the word.
+
+
+```{r}
+words_match2 <- c("church", "datada", "banana",  "abcd", "chch", "different")
+words_match2
+```
+```{r}
+match7<-words_match2%>%str_subset("(..).*?\\1")
+match7
+```
+##### **Explanation for "Contain one letter repeated in at least three places (e.g. "eleven" contains three "e"s.)":**
+
+###### `(.)`: Captures any single character into group 1.
+###### `\\w*`: Matches any number of word characters (letters, digits, and underscores) in between.
+###### `\\1`: Ensures that the captured character appears at least three times.
+
+```{r}
+words_match3<- c("eleven", "dataset", "success", "mathematical", "complete")
+words_match3
+```
+
+```{r}
+match8<-words_match3%>%str_subset("(.)\\w+\\1\\w*\\1")
+match8
+```
+
+
+
